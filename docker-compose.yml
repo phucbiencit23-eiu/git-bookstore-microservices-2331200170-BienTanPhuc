@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   api-gateway:
     # TODO: Define the api-gateway service
@@ -10,12 +8,17 @@ services:
     build: ./api-gateway
     ports:
       - 8000:8000
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
     networks: [bookstore-net]
 
   frontend:
     # TODO: Define the frontend service
     # It should build from the ./frontend directory
     # ...
+    build: ./frontend
     environment:
       - API_BASE=http://localhost:8000
     depends_on:
@@ -27,6 +30,9 @@ services:
     # It should build from the ./user-service directory
     # It should depend on the user-db
     # ...
+    build: ./user-service
+    depends_on:
+      - user-db
     networks: [bookstore-net]
 
   product-service:
@@ -34,6 +40,9 @@ services:
     # It should build from the ./product-service directory
     # It should depend on the product-db
     # ...
+    build: ./product-service
+    depends_on:
+      - product-db
     environment:
       - PGHOST=product-db
       - PGUSER=postgres
@@ -47,6 +56,11 @@ services:
     # It should build from the ./order-service directory
     # It should depend on the order-db, message-broker, and product-service
     # ...
+    build: ./order-service
+    depends_on:
+      - order-db
+      - message-broker
+      - product-service
     environment:
       - PGHOST=order-db
       - PGUSER=postgres
